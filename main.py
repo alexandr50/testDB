@@ -10,7 +10,7 @@ PATH_TO_DB_CONFIG = pathlib.Path(dir_path, 'database.ini')
 def main():
     params = config(PATH_TO_DB_CONFIG)
     db = DBManager('shop', params)
-    print(db.name_db)
+    db.create_database()
 
 if __name__ == '__main__':
     main()
