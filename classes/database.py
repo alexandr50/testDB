@@ -21,7 +21,7 @@ class DBManager:
             with conn.cursor() as cur:
                 cur.execute(f"""CREATE TABLE IF NOT EXISTS shelves (
                     shelve_id INT PRIMARY KEY,
-                    number VARCHAR(5) UNIQUE NOT NULL);
+                    number VARCHAR(20) UNIQUE NOT NULL);
                 """)
 
                 cur.execute(f"""CREATE TABLE IF NOT EXISTS products (
