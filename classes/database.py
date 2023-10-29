@@ -1,7 +1,6 @@
 import psycopg2
 
 
-
 class DBManager:
 
     def __init__(self, name_bd: str, params: dict):
@@ -9,13 +8,12 @@ class DBManager:
         self.params = params
 
     def create_database(self):
-
         conn = psycopg2.connect(dbname='postgres', **self.params)
         conn.autocommit = True
 
         with conn.cursor() as cur:
-            cur.execute(f"""DROP DATABASE IF EXISTS {self.name_db}""")
-            cur.execute(f"""CREATE DATABASE {self.name_db}""")
+            # cur.execute(f"""DROP DATABASE IF EXISTS {self.name_db}""")
+            cur.execute(f"""CREATE DATABASE {self.name_db} IF NOT EXISTS""")
 
         with psycopg2.connect(dbname=self.name_db, **self.params) as conn:
             with conn.cursor() as cur:
@@ -44,10 +42,10 @@ class DBManager:
                 """)
 
                 cur.execute(f"""CREATE TABLE IF NOT EXISTS customers (
-                                    customer_id INT PRIMARY KEY,
-                                    email VARCHAR(255)
-                                    );
-                                """)
+                    customer_id INT PRIMARY KEY,
+                    email VARCHAR(255)
+                    );
+                """)
 
                 cur.execute(f"""CREATE TABLE IF NOT EXISTS orders (
                     order_id INT PRIMARY KEY,
@@ -64,3 +62,23 @@ class DBManager:
                     );
                 """)
 
+    def get_content(self, *args):
+        with psycopg2.connect(dbname=self.name_db, **self.params) as conn:
+            with conn.cursor() as cur:
+                cur.execute(f"""select products.title,
+                   order_items.quantity,
+                   order_items.order_item_id,
+                   orders.order_id,
+                   number as shelve_number
+                   from products
+                inner join order_items
+                    on products.product_id = order_items.product_id
+                inner join shelves
+                    on shelves.shelve_id = order_items.shelve_id
+                inner join orders
+                    on orders.order_id = order_items.order_id
+                    where orders.order_id in {10, 11, 14, 15}
+                    order by shelve_number;""")
+                rows = cur.fetchall()
+
+                print(rows)
